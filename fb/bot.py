@@ -43,4 +43,3 @@ if __name__ == '__main__':
         wait_start(post_time, bot)
 
         i = (i + 1) % 3
-        break
