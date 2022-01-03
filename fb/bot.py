@@ -42,7 +42,13 @@ def wait_start(runTime, bot):
 if __name__ == '__main__':
     hours = [10, 15, 19]
     token = read_token()
-    i = 0
+    current_hour = datetime.datetime.now().hour
+    if current_hour < 10:
+        i = 0
+    elif 10 < current_hour < 15:
+        i = 1
+    else:
+        i = 2
     bot = fb.GraphAPI(token)
     while (True):
         minute = str(random.randint(0, 59)).zfill(2)
