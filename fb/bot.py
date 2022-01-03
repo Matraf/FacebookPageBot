@@ -11,8 +11,8 @@ QUEUE = "resources/memes/"
 P_QUEUE = "resources/prio_memes/"
 
 
-def list_files(dir):
-    return set(next(walk(dir), (None, None, []))[2])
+def list_files(path):
+    return set(next(walk(path), (None, None, []))[2])
 
 
 def read_token():
@@ -20,18 +20,18 @@ def read_token():
         return file.read()
 
 
-def post_meme(bot, meme, dir):
-    bot.put_photo(open(dir + meme, "rb"))
-    os.remove(dir + meme)
+def post_meme(bot, meme, path):
+    bot.put_photo(open(path + meme, "rb"))
+    os.remove(path + meme)
 
 
-def wait_start(runTime, bot):
+def wait_start(run_time, bot):
     prio_memes = list_files(P_QUEUE)
     memes = list_files(QUEUE)
-    startTime = time(*(map(int, runTime.split(':'))))
-    while startTime > datetime.today().time():
+    start_time = time(*(map(int, run_time.split(':'))))
+    while start_time > datetime.today().time():
         sleep(1)
-    if runTime[:2] == '15' and len(prio_memes) > 0:
+    if run_time[:2] == '15' and len(prio_memes) > 0:
         meme = prio_memes.pop()
         post_meme(bot, meme, P_QUEUE)
     else:
@@ -42,15 +42,17 @@ def wait_start(runTime, bot):
 if __name__ == '__main__':
     hours = [10, 15, 19]
     token = read_token()
-    current_hour = datetime.datetime.now().hour
+    bot = fb.GraphAPI(token)
+
+    current_hour = datetime.now().hour
     if current_hour < 10:
         i = 0
-    elif 10 < current_hour < 15:
+    elif 10 <= current_hour < 15:
         i = 1
     else:
         i = 2
-    bot = fb.GraphAPI(token)
-    while (True):
+
+    while True:
         minute = str(random.randint(0, 59)).zfill(2)
         post_time = str(hours[i]) + ":" + minute
         print(post_time)
