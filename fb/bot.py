@@ -6,28 +6,37 @@ from os import walk
 from datetime import datetime, time
 from time import sleep
 
-
-def post_meme(bot):
-    memes = list_files()
-    meme = memes.pop()
-    bot.put_photo(open("resources/memes/" + meme, "rb"))
-    os.remove("resources/memes/" + meme)
+TOKEN = "resources/token.txt"
+QUEUE = "resources/memes/"
+P_QUEUE = "resources/prio_memes/"
 
 
-def wait_start(runTime, bot):
-    startTime = time(*(map(int, runTime.split(':'))))
-    while startTime > datetime.today().time():
-        sleep(1)
-    post_meme(bot)
-
-
-def list_files():
-    return set(next(walk("resources/memes"), (None, None, []))[2])
+def list_files(dir):
+    return set(next(walk(dir), (None, None, []))[2])
 
 
 def read_token():
-    with open("resources/token.txt", mode="r") as file:
+    with open(TOKEN, mode="r") as file:
         return file.read()
+
+
+def post_meme(bot, meme, dir):
+    bot.put_photo(open(dir + meme, "rb"))
+    os.remove(dir + meme)
+
+
+def wait_start(runTime, bot):
+    prio_memes = list_files(P_QUEUE)
+    memes = list_files(QUEUE)
+    startTime = time(*(map(int, runTime.split(':'))))
+    while startTime > datetime.today().time():
+        sleep(1)
+    if runTime[:2] == '15' and len(prio_memes) > 0:
+        meme = prio_memes.pop()
+        post_meme(bot, meme, P_QUEUE)
+    else:
+        meme = memes.pop()
+        post_meme(bot, meme, QUEUE)
 
 
 if __name__ == '__main__':
