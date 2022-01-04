@@ -10,6 +10,8 @@ TOKEN = "resources/token.txt"
 QUEUE = "resources/memes/"
 P_QUEUE = "resources/prio_memes/"
 
+logger = open('logs.log', 'a+')
+
 
 def list_files(path):
     return set(next(walk(path), (None, None, []))[2])
@@ -23,14 +25,17 @@ def read_token():
 def post_meme(bot, meme, path):
     bot.put_photo(open(path + meme, "rb"))
     os.remove(path + meme)
+    logger.write("Posted meme")
 
 
 def wait_start(run_time, bot):
     prio_memes = list_files(P_QUEUE)
     memes = list_files(QUEUE)
     start_time = time(*(map(int, run_time.split(':'))))
+    print(str(start_time) + " " + str(datetime.today().time()))
     while start_time > datetime.today().time():
-        sleep(1)
+        sleep(60)
+
     if run_time[:2] == '15' and len(prio_memes) > 0:
         meme = prio_memes.pop()
         post_meme(bot, meme, P_QUEUE)
@@ -52,11 +57,8 @@ if __name__ == '__main__':
     else:
         i = 2
 
-    while True:
-        minute = str(random.randint(0, 59)).zfill(2)
-        post_time = str(hours[i]) + ":" + minute
-        print(post_time)
+    minute = str(random.randint(0, 59)).zfill(2)
+    post_time = str(hours[i]) + ":" + minute
+    logger.write("Next post at:\t" + post_time)
 
-        wait_start(post_time, bot)
-
-        i = (i + 1) % 3
+    wait_start(post_time, bot)
