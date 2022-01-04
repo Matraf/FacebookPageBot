@@ -59,6 +59,6 @@ if __name__ == '__main__':
 
     minute = str(random.randint(0, 59)).zfill(2)
     post_time = str(hours[i]) + ":" + minute
-    logger.write("Next post at:\t" + post_time)
+    logger.write("Next post at:\t" + post_time + "\n")
 
     wait_start(post_time, bot)
